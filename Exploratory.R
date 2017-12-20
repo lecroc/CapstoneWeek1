@@ -3,7 +3,6 @@
 # libraries
 
 library(quanteda)
-library(tm)
 
 # paths to data
 
@@ -30,21 +29,25 @@ tweets$Source<-c("Tweets")
 
 AllText<-as.data.frame(rbind(blogs,tweets,news))
 
+save(AllText, file = "AllText.Rda")
+
 # Create corpus of all text data
 
-TxtCorp <- corpus(AllText, text_field = "Text")
+TxtCorp <- corpus(AllText$Text)
 
 summary(TxtCorp, n=5)
+
+docvars(TxtCorp, "Source")<-AllText$Source
 
 # Create document feature matrix (dfm)
 
 Mydfm <- dfm(TxtCorp,
          tolower = TRUE, stem = FALSE, remove_punct = TRUE,
-         remove = stopwords("english"))
+         remove = stopwords("english"), remove_numbers=TRUE)
 
 # Display top features
 
-topfeatures(Mydfm)
+topfeatures(Mydfm, n=1000)
 
 tbl<-textstat_frequency(Mydfm)
 
