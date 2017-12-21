@@ -3,6 +3,7 @@
 # libraries
 
 library(quanteda)
+library(dplyr)
 
 # Check if data file exists, if not, create
 
@@ -48,14 +49,14 @@ docvars(TxtCorp, "Source")<-AllText$Source
 # Create document feature matrix (dfm)
 
 Mydfm <- dfm(TxtCorp,
-         tolower = T, stem = F, remove_punct = T,
-         remove_numbers=T)
+         tolower = T, stem = F, remove_punct = T, verbose=T,
+         remove_numbers=T, remove = "badwords.txt", remove_symbols=T, ngrams = 1)
 
 save(Mydfm, file = "Mydfm.Rda")
 
 # Display top features
 
-topfeatures(Mydfm, n=100)
+TF<-topfeatures(Mydfm, n=100)
 
 tbl<-textstat_frequency(Mydfm)
 
@@ -68,5 +69,19 @@ set.seed(100)
 textplot_wordcloud(Mydfm, min.freq = 30000, random.order = FALSE,
                    rot.per = .25, 
                    colors = RColorBrewer::brewer.pal(8,"Dark2"))
+
+# Analyze frequencies
+
+tbl$doccount<-1
+
+tbl1<-tbl %>%
+  group_by(doccount) %>%
+  mutate(cume = cumsum(frequency)) %>%
+
+tbl1$pctfreq<-tbl1$cume/sum(tbl1$frequency)
+
+plot(tbl1$rank, tbl1$pctfreq)
+
+
 
 
