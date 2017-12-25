@@ -52,21 +52,19 @@ Mydfm <- dfm(TxtCorp,
          tolower = T, stem = F, remove_punct = T, verbose=T,
          remove_numbers=T, remove = "badwords.txt", remove_symbols=T, ngrams = 1)
 
-save(Mydfm, file = "Mydfm.Rda")
+save(Mydfm, file="Mydfm.Rda")
 
 # Display top features
 
-TF<-topfeatures(Mydfm, n=100)
+TF<-topfeatures(Mydfm, n=1"00)
 
 tbl<-textstat_frequency(Mydfm)
-
-save(tbl, file="tbl.Rda")
 
 # Make a wordcloud
 
 set.seed(100)
 
-textplot_wordcloud(Mydfm, min.freq = 30000, random.order = FALSE,
+textplot_wordcloud(Mydfm, min.freq = 20000, random.order = FALSE,
                    rot.per = .25, 
                    colors = RColorBrewer::brewer.pal(8,"Dark2"))
 
@@ -76,11 +74,14 @@ tbl$doccount<-1
 
 tbl1<-tbl %>%
   group_by(doccount) %>%
-  mutate(cume = cumsum(frequency)) %>%
+  mutate(cume = cumsum(frequency))
 
 tbl1$pctfreq<-tbl1$cume/sum(tbl1$frequency)
 
 plot(tbl1$rank, tbl1$pctfreq)
+
+
+Myfcm<-fcm(Mydfm, context="document", count="frequency")
 
 
 
