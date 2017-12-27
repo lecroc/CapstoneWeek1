@@ -46,42 +46,39 @@ summary(TxtCorp, n=5)
 
 docvars(TxtCorp, "Source")<-AllText$Source
 
-# Create document feature matrix (dfm)
+set.seed(123)
 
-Mydfm <- dfm(TxtCorp,
-         tolower = T, stem = F, remove_punct = T, verbose=T,
+sampsize<-ndoc(TxtCorp)*.03
+
+TxtCorp<-corpus_sample(TxtCorp, sampsize)
+
+# Create document feature matrix (dfm) of unigrams
+
+Mydfm1 <- dfm(TxtCorp, tolower = T, stem = F, remove_punct = T, verbose=T,
          remove_numbers=T, remove = "badwords.txt", remove_symbols=T, ngrams = 1)
-
-save(Mydfm, file="Mydfm.Rda")
 
 # Display top features
 
-TF<-topfeatures(Mydfm, n=1"00)
+TF1<-topfeatures(Mydfm1, n=50)
 
-tbl<-textstat_frequency(Mydfm)
+tbl1<-textstat_frequency(Mydfm1)
 
-# Make a wordcloud
+fcm1<-fcm(Mydfm1)
 
-set.seed(100)
+# Create document feature matrix of bigrams
 
-textplot_wordcloud(Mydfm, min.freq = 20000, random.order = FALSE,
-                   rot.per = .25, 
-                   colors = RColorBrewer::brewer.pal(8,"Dark2"))
+Mydfm2<-dfm(TxtCorp, tolower = T, stem = F, remove_punct = T, verbose=T,
+            remove_numbers=T, remove = "badwords.txt", remove_symbols=T, ngrams = 1:2)
 
-# Analyze frequencies
+TF2<-topfeatures(Mydfm2, n=50)
 
-tbl$doccount<-1
+tbl2<-textstat_frequency(Mydfm2)
 
-tbl1<-tbl %>%
-  group_by(doccount) %>%
-  mutate(cume = cumsum(frequency))
-
-tbl1$pctfreq<-tbl1$cume/sum(tbl1$frequency)
-
-plot(tbl1$rank, tbl1$pctfreq)
+fcm2<-fcm(Mydfm2)
 
 
-Myfcm<-fcm(Mydfm, context="document", count="frequency")
+
+
 
 
 
